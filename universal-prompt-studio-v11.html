@@ -616,7 +616,7 @@
       user_intent: { type: 'textarea', label: 'What do you want to design & build?', placeholder: 'Describe the site or UI in plain English — e.g., "A landing page for an AI note-taking app, calm and premium, that converts visitors to a waitlist"', section: 'vision' },
       'vision.site_type': { type: 'select', label: 'Site / Page Type', options: ['landing_page', 'marketing_site_multipage', 'portfolio', 'blog_magazine', 'saas_app_ui', 'dashboard', 'e_commerce_storefront', 'product_detail_page', 'documentation_site', 'agency_studio_site', 'event_conference_site', 'restaurant_local_business', 'personal_site_link_hub', 'web_app_ui', 'email_template', 'single_component'], section: 'vision' },
       'vision.target_audience': { type: 'text', label: 'Target Audience', placeholder: 'e.g., startup founders, home cooks, enterprise IT buyers', section: 'vision' },
-      'vision.primary_goal': { type: 'select', label: 'Primary Goal', options: ['convert_signups', 'sell_products', 'generate_leads', 'showcase_work', 'inform_educate', 'build_community', 'book_appointments', 'drive_downloads', 'establish_credibility', 'entertain_delight'], section: 'vision' },
+      'vision.goals': { type: 'multiselect', label: 'Project Goals', options: ['convert_signups', 'sell_products', 'generate_leads', 'showcase_work', 'inform_educate', 'build_community', 'book_appointments', 'drive_downloads', 'establish_credibility', 'entertain_delight'], section: 'vision' },
       // Brand & Content
       'brand.name': { type: 'text', label: 'Brand / Product Name', placeholder: 'e.g., Driftnote', section: 'brand' },
       'brand.tagline': { type: 'text', label: 'Tagline / Headline', placeholder: 'e.g., "Notes that organize themselves"', section: 'brand' },
@@ -1393,7 +1393,7 @@
       },
       frontend: {
         'SaaS Landing Page': {
-          'vision.site_type': 'landing_page', 'vision.primary_goal': 'convert_signups',
+          'vision.site_type': 'landing_page', 'vision.goals': ['convert_signups'],
           'brand.tone': ['professional', 'friendly'], 'brand.content_source': 'generate_realistic_copy',
           'aesthetic.style': 'corporate_clean', 'aesthetic.era_vibe': 'cutting_edge_2026',
           'aesthetic.mood': ['trustworthy', 'optimistic'], 'aesthetic.density': 'airy_generous_whitespace',
@@ -1418,7 +1418,7 @@
           'output.include_design_tokens': true, 'output.include_section_walkthrough': true,
         },
         'Glassmorphic Dashboard': {
-          'vision.site_type': 'dashboard', 'vision.primary_goal': 'inform_educate',
+          'vision.site_type': 'dashboard', 'vision.goals': ['inform_educate'],
           'aesthetic.style': 'glassmorphism', 'aesthetic.mood': ['cool', 'sophisticated'], 'aesthetic.density': 'information_rich',
           'aesthetic.signature_details': ['glass_blur_panels', 'mesh_gradients', 'spotlight_glows', 'thin_hairline_borders'],
           'color.palette_style': 'analogous', 'color.brand_colors': 'deep indigo base, cyan accent, frosted white glass surfaces',
@@ -1439,7 +1439,7 @@
           'output.target_tool': 'Lovable', 'output.output_type': 'working_code', 'output.include_design_tokens': true,
         },
         'Brutalist Portfolio': {
-          'vision.site_type': 'portfolio', 'vision.primary_goal': 'showcase_work',
+          'vision.site_type': 'portfolio', 'vision.goals': ['showcase_work'],
           'brand.tone': ['bold', 'edgy', 'quirky'], 'brand.content_source': 'use_placeholder_copy',
           'aesthetic.style': 'neo_brutalist', 'aesthetic.era_vibe': 'retro_90s', 'aesthetic.mood': ['rebellious', 'playful'],
           'aesthetic.density': 'dense',
@@ -1465,7 +1465,7 @@
           'output.target_tool': 'Claude Code', 'output.output_type': 'working_code', 'output.include_section_walkthrough': true,
         },
         'E-commerce Storefront': {
-          'vision.site_type': 'e_commerce_storefront', 'vision.primary_goal': 'sell_products',
+          'vision.site_type': 'e_commerce_storefront', 'vision.goals': ['sell_products'],
           'brand.tone': ['warm', 'friendly'], 'brand.content_source': 'generate_realistic_copy',
           'aesthetic.style': 'minimalist', 'aesthetic.mood': ['warm', 'trustworthy'], 'aesthetic.density': 'balanced',
           'color.palette_style': 'earth_tones', 'color.background_style': 'warm_off_white',
@@ -1490,7 +1490,7 @@
           'output.target_tool': 'Bolt.new', 'output.output_type': 'working_code',
         },
         'Dark Luxury Agency': {
-          'vision.site_type': 'agency_studio_site', 'vision.primary_goal': 'establish_credibility',
+          'vision.site_type': 'agency_studio_site', 'vision.goals': ['establish_credibility'],
           'brand.tone': ['luxurious', 'authoritative', 'quiet_understated'],
           'aesthetic.style': 'dark_luxury', 'aesthetic.era_vibe': 'timeless_classic', 'aesthetic.mood': ['mysterious', 'sophisticated'],
           'aesthetic.density': 'ultra_minimal', 'aesthetic.signature_details': ['grain_noise_texture', 'oversized_typography', 'thin_hairline_borders', 'asymmetric_layout'],
@@ -2865,25 +2865,25 @@
                 </div>
               </div>
 
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12 auto-rows-fr">
                 {Object.entries(TYPE_META).map(([type, { icon, title, desc, color }]) => (
                   <button
                     key={type}
                     onClick={() => setPromptType(type)}
-                    className={`p-8 rounded-2xl bg-gradient-to-br ${color} text-white text-left hover:scale-105 transition-transform shadow-xl`}
+                    className={`p-5 rounded-xl bg-gradient-to-br ${color} text-white text-left hover:scale-105 transition-transform shadow-xl`}
                   >
-                    <div className="text-5xl mb-4">{icon}</div>
-                    <h2 className="text-2xl font-bold mb-2">{title}</h2>
-                    <p className="text-sm opacity-80">{desc}</p>
+                    <div className="text-3xl mb-3">{icon}</div>
+                    <h2 className="text-lg font-bold mb-1">{title}</h2>
+                    <p className="text-xs opacity-80">{desc}</p>
                   </button>
                 ))}
                 <button
                   onClick={() => setShowChain(true)}
-                  className="p-8 rounded-2xl bg-gradient-to-br from-orange-500 to-pink-600 text-white text-left hover:scale-105 transition-transform shadow-xl"
+                  className="p-5 rounded-xl bg-gradient-to-br from-orange-500 to-pink-600 text-white text-left hover:scale-105 transition-transform shadow-xl"
                 >
-                  <div className="text-5xl mb-4">🔗</div>
-                  <h2 className="text-2xl font-bold mb-2">Chain Builder</h2>
-                  <p className="text-sm opacity-80">Multi-step pipelines · Plan → Build → Translate to any platform</p>
+                  <div className="text-3xl mb-3">🔗</div>
+                  <h2 className="text-lg font-bold mb-1">Chain Builder</h2>
+                  <p className="text-xs opacity-80">Multi-step pipelines · Plan → Build → Translate to any platform</p>
                 </button>
               </div>
 
