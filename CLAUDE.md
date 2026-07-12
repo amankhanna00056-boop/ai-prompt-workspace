@@ -11,7 +11,7 @@ open universal-prompt-studio-v11.html    # macOS
 xdg-open universal-prompt-studio-v11.html # Linux
 ```
 
-No npm, no node_modules, no bundler. Everything is a single self-contained HTML file (~2950 lines).
+No npm, no node_modules, no bundler. Everything is a single self-contained HTML file (~3360 lines).
 
 ## Architecture
 
@@ -36,13 +36,15 @@ _(Line numbers are approximate — grep for the `const NAME =` / `function NAME(
 | 490–547 | `VIBE_SCHEMA` — vibe coder project builder (14 tech stack decisions from The Vibe Coder's Handbook) |
 | 548–579 | `AUDIO_SCHEMA` — music/voice/SFX prompts (Suno, Udio, ElevenLabs) |
 | 580–612 | `AGENT_SCHEMA` — tool-use & multi-agent prompts (Agent SDK, MCP) |
-| 613–701 | `FRONTEND_SCHEMA` — frontend/website design prompts (visual style, layout, typography, motion, tech stack) |
-| 702–853 | `SCHEMAS`, `SELECT_SENTINELS`, `SENTINEL_*`, `TYPE_META`, `SECTION_INFO` — registry and UI metadata |
-| 854–1430 | `PRESETS` — one-click presets per prompt type |
-| ~1431–1540 | Toast notification system + `useEscapeKey`/`useDarkMode` hooks + utilities |
-| ~1541–1853 | `ChainBuilder` — multi-step pipeline component |
-| 1854–2940 | `UniversalPromptStudio` — main component (forms, output, templates, field search, confirm modal) |
-| ~2941–2954 | `App` wrapper + ReactDOM render |
+| 614–701 | `FRONTEND_SCHEMA` — frontend/website design prompts (visual style, layout, typography, motion, tech stack) |
+| 703–791 | `PM_SCHEMA` — PMBOK 8 project management prompts (Seven Questions, EVM-lite, risk registers) |
+| 793–850 | `LOOP_SCHEMA` — agent loop / "Ralph" loop-engineering prompts (stop conditions, verification gates, budgets) |
+| 852–1030 | `SCHEMAS`, `SELECT_SENTINELS`, `SENTINEL_*`, `TYPE_META`, `SECTION_INFO` — registry and UI metadata |
+| 1032–1825 | `PRESETS` — one-click presets per prompt type |
+| ~1826–1943 | Toast notification system + `useEscapeKey`/`useDarkMode` hooks + utilities |
+| ~1944–2253 | `ChainBuilder` — multi-step pipeline component |
+| 2254–3340 | `UniversalPromptStudio` — main component (forms, output, templates, field search, confirm modal) |
+| ~3341–3356 | `App` wrapper + ReactDOM render |
 
 ## Key Patterns
 
