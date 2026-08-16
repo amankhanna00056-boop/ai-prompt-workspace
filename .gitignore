@@ -4,3 +4,6 @@ Thumbs.db
 .playwright-mcp/
 skills/
 *.pdf
+
+# Local backup files
+*.seo-backup
