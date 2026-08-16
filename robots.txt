@@ -1,0 +1,4 @@
+﻿User-agent: *
+Allow: /
+
+Sitemap: https://amankhanna00056-boop.github.io/ai-prompt-workspace/sitemap.xml
