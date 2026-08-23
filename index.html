@@ -2284,6 +2284,27 @@
       });
       const [templateName, setTemplateName] = useState('');
       const [showOutput, setShowOutput] = useState(false);
+
+      // === PRO FOUNDATION: PROMPT HISTORY ===
+      const [promptHistory, setPromptHistory] = useState(() => {
+        try {
+          const saved = JSON.parse(localStorage.getItem('promptStudioHistory') || '[]');
+          return Array.isArray(saved) ? saved : [];
+        } catch {
+          return [];
+        }
+      });
+
+      // === PRO FOUNDATION: PROMPT FAVORITES ===
+      const [favoritePrompts, setFavoritePrompts] = useState(() => {
+        try {
+          const saved = JSON.parse(localStorage.getItem('promptStudioFavorites') || '[]');
+          return Array.isArray(saved) ? saved : [];
+        } catch {
+          return [];
+        }
+      });
+
       const [viewingTemplate, setViewingTemplate] = useState(null);
       const [templateViewMode, setTemplateViewMode] = useState('json');
       const [outputMode, setOutputMode] = useState('json'); // 'json' | 'text'
@@ -2646,6 +2667,60 @@
           setImportError('Invalid JSON — please check your input and try again.');
         }
       };
+
+      // Save the current generated prompt to local history (max 50 items)
+      const saveToHistory = useCallback(() => {
+        if (!promptType) return;
+        const content = outputMode === 'json' ? generatedJSON : generatedPlainText;
+        if (!content || !content.trim()) return;
+
+        const entry = {
+          id: Date.now(),
+          type: promptType,
+          content,
+          outputMode,
+          createdAt: new Date().toISOString()
+        };
+
+        setPromptHistory(prev => {
+          const next = [entry, ...prev].slice(0, 50);
+          try {
+            localStorage.setItem('promptStudioHistory', JSON.stringify(next));
+          } catch (e) {
+            console.error('History save failed:', e);
+          }
+          return next;
+        });
+      }, [promptType, outputMode, generatedJSON, generatedPlainText]);
+
+
+      // Add or remove the current generated prompt from Favorites
+      const toggleFavorite = useCallback(() => {
+        if (!promptType) return;
+        const content = outputMode === 'json' ? generatedJSON : generatedPlainText;
+        if (!content || !content.trim()) return;
+
+        setFavoritePrompts(prev => {
+          const existing = prev.find(item => item.content === content && item.type === promptType);
+          const next = existing
+            ? prev.filter(item => item.id !== existing.id)
+            : [{
+                id: Date.now(),
+                type: promptType,
+                content,
+                outputMode,
+                createdAt: new Date().toISOString()
+              }, ...prev].slice(0, 50);
+
+          try {
+            localStorage.setItem('promptStudioFavorites', JSON.stringify(next));
+          } catch (e) {
+            console.error('Favorites save failed:', e);
+          }
+          return next;
+        });
+      }, [promptType, outputMode, generatedJSON, generatedPlainText]);
+
 
       const copyToClipboard = async () => {
         const content = outputMode === 'json' ? generatedJSON : generatedPlainText;
@@ -3120,7 +3195,7 @@
                   ))}
                 </select>
                 <button
-                  onClick={() => setShowOutput(true)}
+                  onClick={() => { saveToHistory(); setShowOutput(true); }}
                   className="px-4 py-2 bg-white text-purple-600 rounded-lg font-semibold hover:bg-purple-100"
                 >
                   Generate JSON →
@@ -3225,7 +3300,7 @@
                     </button>
                   ) : (
                     <button
-                      onClick={() => setShowOutput(true)}
+                      onClick={() => { saveToHistory(); setShowOutput(true); }}
                       className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
                     >
                       Generate JSON ✓
@@ -3296,6 +3371,12 @@
                   </div>
 
                   {/* Actions */}
+                  <button
+                    onClick={toggleFavorite}
+                    className="flex-1 px-4 py-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 font-semibold"
+                  >
+                    {favoritePrompts.some(item => item.content === (outputMode === "json" ? generatedJSON : generatedPlainText) && item.type === promptType) ? "Unfavorite" : "Favorite"}
+                  </button>
                   <div className="flex gap-2">
                     <button
                       onClick={copyToClipboard}
