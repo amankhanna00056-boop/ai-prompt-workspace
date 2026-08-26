@@ -49,7 +49,100 @@
   
   <script type="text/babel">
     const { useState, useEffect, useRef, useMemo, useCallback } = React;
+        // === MONETIZATION FOUNDATION ===
+    const PLAN_CONFIG = {
+      free: {
+        id: 'free',
+        name: 'Free',
+        description: 'Core prompt building tools',
+      },
+      pro: {
+        id: 'pro',
+        name: 'Pro',
+        description: 'Advanced AI prompt features',
+      },
+      business: {
+        id: 'business',
+        name: 'Business',
+        description: 'Team and workspace features',
+      },
+    };
+    const FEATURE_CONFIG = {
+      builders: {
+        free: true,
+        pro: true,
+        business: true,
+      },
+      history: {
+        free: true,
+        pro: true,
+        business: true,
+      },
+      favorites: {
+        free: true,
+        pro: true,
+        business: true,
+      },
+      templates: {
+        free: true,
+        pro: true,
+        business: true,
+      },
+      premiumTemplates: {
+        free: false,
+        pro: true,
+        business: true,
+      },
+      advancedFeatures: {
+        free: false,
+        pro: true,
+        business: true,
+      },
+      teamWorkspace: {
+        free: false,
+        pro: false,
+        business: true,
+      },
+      sharedLibrary: {
+        free: false,
+        pro: false,
+        business: true,
+      },
+    };
+        const CURRENT_PLAN = 'free';
 
+    const hasFeature = (feature, plan = CURRENT_PLAN) => {
+      return FEATURE_CONFIG[feature]?.[plan] === true;
+    };
+        const requireFeature = (feature, onUpgrade) => {
+      if (hasFeature(feature)) return true;
+
+      if (typeof onUpgrade === 'function') {
+        onUpgrade(feature);
+      }
+
+      return false;
+    };
+        const getUpgradePlanForFeature = (feature) => {
+      const businessFeatures = ['teamWorkspace', 'sharedLibrary'];
+
+      if (businessFeatures.includes(feature)) {
+        return 'business';
+      }
+
+      return 'pro';
+    };
+
+    const getFeatureLabel = (feature) => {
+      const labels = {
+        premiumTemplates: 'Premium Templates',
+        advancedFeatures: 'Advanced Features',
+        teamWorkspace: 'Team Workspace',
+        sharedLibrary: 'Shared Library',
+      };
+
+      return labels[feature] || 'This feature';
+    };
     // === SCHEMA DEFINITIONS ===
     
     const MEDIUM_AESTHETICS = {
@@ -2271,7 +2364,7 @@
 
     // === COMPONENTS ===
 
-    function UniversalPromptStudio() {
+    function UniversalPromptStudio({ onOpenPlans }) {
       const [, themeMode, setThemeMode] = useDarkMode();
       const [promptType, setPromptType] = useState(null);
       const [showChain, setShowChain] = useState(false);
@@ -3185,6 +3278,12 @@
                 >
                   📚 Library
                 </button>
+                                <button
+                  onClick={onOpenPlans}
+                  className="px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30 text-sm"
+                >
+                  ⭐ Plans
+                </button>
                 <button
                   onClick={() => setShowImport(true)}
                   className="px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30 text-sm"
@@ -3448,12 +3547,149 @@
         </div>
       );
     }
+    function PlansModal({ onClose }) {
+      return (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4"
+          onClick={onClose}
+        >
+          <div
+            className="w-full max-w-5xl overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-gray-900"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-gray-200 px-6 py-5 dark:border-gray-700">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  Plans & Pricing
+                </h2>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  Choose the plan that fits your AI prompt workflow.
+                </p>
+              </div>
+              <button
+                onClick={onClose}
+                className="rounded-lg px-3 py-2 text-xl text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-white"
+                aria-label="Close plans"
+              >
+                ×
+              </button>
+            </div>
 
-    function App() {
+            <div className="grid gap-5 p-6 md:grid-cols-3">
+              {/* Free */}
+              <div className="rounded-2xl border border-gray-200 p-6 dark:border-gray-700">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                  {PLAN_CONFIG.free.name}
+                </h3>
+
+                <div className="mt-4 text-3xl font-bold text-gray-900 dark:text-white">
+                  ₹0
+                  <span className="text-sm font-normal text-gray-500"> forever</span>
+                </div>
+
+                <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">
+                  Core prompt building tools for everyone.
+                </p>
+
+                <ul className="mt-6 space-y-3 text-sm text-gray-700 dark:text-gray-300">
+                  <li>✓ Prompt Builders</li>
+                  <li>✓ Local History</li>
+                  <li>✓ Favorites</li>
+                  <li>✓ Basic Templates</li>
+                  <li>✓ Local Storage</li>
+                </ul>
+
+                <button
+                  disabled
+                  className="mt-7 w-full cursor-default rounded-xl border border-gray-300 px-4 py-3 text-sm font-semibold text-gray-600 dark:border-gray-600 dark:text-gray-300"
+                >
+                  Current Plan
+                </button>
+              </div>
+
+              {/* Pro */}
+              <div className="relative rounded-2xl border-2 border-indigo-500 p-6">
+                <div className="absolute -top-3 left-5 rounded-full bg-indigo-500 px-3 py-1 text-xs font-semibold text-white">
+                  PRO
+                </div>
+
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                  {PLAN_CONFIG.pro.name}
+                </h3>
+
+                <div className="mt-4 text-3xl font-bold text-gray-900 dark:text-white">
+                  Coming Soon
+                </div>
+
+                <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">
+                  Advanced features for serious prompt creators.
+                </p>
+
+                <ul className="mt-6 space-y-3 text-sm text-gray-700 dark:text-gray-300">
+                  <li>✓ Everything in Free</li>
+                  <li>✓ Premium Templates</li>
+                  <li>✓ Advanced Features</li>
+                  <li>✓ Higher Usage Limits</li>
+                  <li>✓ Cloud Storage — future</li>
+                </ul>
+
+                <button
+                  disabled
+                  className="mt-7 w-full cursor-default rounded-xl bg-indigo-500/10 px-4 py-3 text-sm font-semibold text-indigo-600 dark:text-indigo-400"
+                >
+                  Coming Soon
+                </button>
+              </div>
+
+              {/* Business */}
+              <div className="rounded-2xl border border-gray-200 p-6 dark:border-gray-700">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                  {PLAN_CONFIG.business.name}
+                </h3>
+
+                <div className="mt-4 text-3xl font-bold text-gray-900 dark:text-white">
+                  Coming Soon
+                </div>
+
+                <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">
+                  Collaboration and workspace features for teams.
+                </p>
+
+                <ul className="mt-6 space-y-3 text-sm text-gray-700 dark:text-gray-300">
+                  <li>✓ Everything in Pro</li>
+                  <li>✓ Team Workspace</li>
+                  <li>✓ Shared Library</li>
+                  <li>✓ Team Collaboration</li>
+                  <li>✓ Business Controls</li>
+                </ul>
+
+                <button
+                  disabled
+                  className="mt-7 w-full cursor-default rounded-xl border border-gray-300 px-4 py-3 text-sm font-semibold text-gray-600 dark:border-gray-600 dark:text-gray-300"
+                >
+                  Coming Soon
+                </button>
+              </div>
+            </div>
+
+            <div className="border-t border-gray-200 px-6 py-4 text-center text-xs text-gray-500 dark:border-gray-700 dark:text-gray-400">
+              Payments and subscriptions will be added later.
+            </div>
+          </div>
+        </div>
+      );
+    }
+        function App() {
+      const [showPlans, setShowPlans] = useState(false);
+
       return (
         <React.Fragment>
-          <UniversalPromptStudio />
+          <UniversalPromptStudio onOpenPlans={() => setShowPlans(true)} />
           <ToastContainer />
+
+          {showPlans && (
+            <PlansModal onClose={() => setShowPlans(false)} />
+          )}
         </React.Fragment>
       );
     }
