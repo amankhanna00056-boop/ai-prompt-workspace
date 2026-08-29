@@ -3547,7 +3547,7 @@
         </div>
       );
     }
-    function PlansModal({ onClose }) {
+    function PlansModal({ onClose, onUpgrade }) {
       return (
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4"
@@ -3634,10 +3634,10 @@
                 </ul>
 
                 <button
-                  disabled
-                  className="mt-7 w-full cursor-default rounded-xl bg-indigo-500/10 px-4 py-3 text-sm font-semibold text-indigo-600 dark:text-indigo-400"
+                  onClick={() => onUpgrade('pro')}
+                  className="mt-7 w-full rounded-xl bg-indigo-500 px-4 py-3 text-sm font-semibold text-white hover:bg-indigo-600"
                 >
-                  Coming Soon
+                  Upgrade to Pro
                 </button>
               </div>
 
@@ -3664,10 +3664,10 @@
                 </ul>
 
                 <button
-                  disabled
-                  className="mt-7 w-full cursor-default rounded-xl border border-gray-300 px-4 py-3 text-sm font-semibold text-gray-600 dark:border-gray-600 dark:text-gray-300"
+                  onClick={() => onUpgrade('business')}
+                  className="mt-7 w-full rounded-xl border border-gray-300 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
                 >
-                  Coming Soon
+                  Upgrade to Business
                 </button>
               </div>
             </div>
@@ -3688,7 +3688,7 @@
           <ToastContainer />
 
           {showPlans && (
-            <PlansModal onClose={() => setShowPlans(false)} />
+            <PlansModal onClose={() => setShowPlans(false)} onUpgrade={handleUpgrade} />
           )}
         </React.Fragment>
       );
