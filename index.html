@@ -143,6 +143,137 @@
 
       return labels[feature] || 'This feature';
     };
+    // === ACCOUNT ARCHITECTURE FOUNDATION ===
+    // Local-only account foundation. Designed for future auth/cloud migration.
+    const ACCOUNT_ARCHITECTURE_FOUNDATION = true;
+    const ACCOUNT_STORAGE_KEY = 'promptStudioAccount';
+
+    const DEFAULT_ACCOUNT = {
+      version: 1,
+      userId: null,
+      email: null,
+      displayName: null,
+      plan: 'free',
+      status: 'guest',
+      currency: 'USD',
+      country: null,
+      createdAt: null,
+      updatedAt: null,
+      subscription: {
+        status: 'none',
+        provider: null,
+        customerId: null,
+        subscriptionId: null,
+        currentPeriodEnd: null,
+      },
+    };
+
+    const loadAccount = () => {
+      try {
+        const saved = JSON.parse(
+          localStorage.getItem(ACCOUNT_STORAGE_KEY) || 'null'
+        );
+
+        if (!saved || typeof saved !== 'object') {
+          return { ...DEFAULT_ACCOUNT };
+        }
+
+        return {
+          ...DEFAULT_ACCOUNT,
+          ...saved,
+          subscription: {
+            ...DEFAULT_ACCOUNT.subscription,
+            ...(saved.subscription || {}),
+          },
+        };
+      } catch (e) {
+        console.error('Account load failed:', e);
+        return { ...DEFAULT_ACCOUNT };
+      }
+    };
+
+    const saveAccount = (account) => {
+      try {
+        const nextAccount = {
+          ...DEFAULT_ACCOUNT,
+          ...account,
+          updatedAt: new Date().toISOString(),
+          subscription: {
+            ...DEFAULT_ACCOUNT.subscription,
+            ...(account?.subscription || {}),
+          },
+        };
+
+        localStorage.setItem(
+          ACCOUNT_STORAGE_KEY,
+          JSON.stringify(nextAccount)
+        );
+
+        return nextAccount;
+      } catch (e) {
+        console.error('Account save failed:', e);
+        return account;
+      }
+    };
+
+    const clearAccount = () => {
+      try {
+        localStorage.removeItem(ACCOUNT_STORAGE_KEY);
+      } catch (e) {
+        console.error('Account clear failed:', e);
+      }
+    };
+
+    const createGuestAccount = () => {
+      const now = new Date().toISOString();
+
+      return {
+        ...DEFAULT_ACCOUNT,
+        userId: null,
+        email: null,
+        displayName: null,
+        plan: 'free',
+        status: 'guest',
+        currency: 'USD',
+        country: null,
+        createdAt: now,
+        updatedAt: now,
+      };
+    };
+
+    const getAccountPlan = (account) => {
+      const plan = account?.plan;
+
+      if (plan && PLAN_CONFIG[plan]) {
+        return plan;
+      }
+
+      return 'free';
+    };
+
+    const isAuthenticatedAccount = (account) => {
+      return account?.status === 'active' && !!account?.userId;
+    };
+
+    const isPaidPlan = (account) => {
+      const plan = getAccountPlan(account);
+      return plan === 'pro' || plan === 'business';
+    };
+
+    const getAccountCurrency = (account) => {
+      return account?.currency || 'USD';
+    };
+
+    // Future payment/token architecture.
+    // Disabled until payment infrastructure and token launch are ready.
+    const PAYMENT_CONFIG = {
+      currency: 'USD',
+      supportedProviders: [],
+      provider: null,
+      tokenPaymentsEnabled: false,
+      tokenSymbol: null,
+      tokenNetwork: null,
+    };
     // === SCHEMA DEFINITIONS ===
     
     const MEDIUM_AESTHETICS = {
