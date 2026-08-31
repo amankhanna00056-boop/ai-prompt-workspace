@@ -3893,6 +3893,11 @@
         function App() {
       const [showPlans, setShowPlans] = useState(false);
 
+      const handleUpgrade = (plan) => {
+        const planName = PLAN_CONFIG[plan]?.name || plan;
+        alert(planName + " upgrade is coming soon. Payments are not enabled yet.");
+      };
+
       return (
         <React.Fragment>
           <UniversalPromptStudio onOpenPlans={() => setShowPlans(true)} />
