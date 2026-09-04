@@ -111,6 +111,47 @@
     };
         const CURRENT_PLAN = 'free';
 
+        // === FREE USAGE LIMIT ===
+        const FREE_DAILY_GENERATION_LIMIT = 20;
+
+        const getDailyUsageKey = () => {
+          const today = new Date().toISOString().slice(0, 10);
+          return promptStudioUsage_;
+        };
+
+        const getDailyGenerationCount = () => {
+          try {
+            return Number(localStorage.getItem(getDailyUsageKey()) || 0);
+          } catch {
+            return 0;
+          }
+        };
+
+        const canGeneratePrompt = (onUpgrade) => {
+          if (CURRENT_PLAN !== 'free') return true;
+
+          const count = getDailyGenerationCount();
+
+          if (count >= FREE_DAILY_GENERATION_LIMIT) {
+            if (typeof onUpgrade === 'function') {
+              onUpgrade('advancedFeatures');
+            }
+            return false;
+          }
+
+          return true;
+        };
+
+        const recordPromptGeneration = () => {
+          try {
+            const key = getDailyUsageKey();
+            const count = getDailyGenerationCount();
+            localStorage.setItem(key, String(count + 1));
+          } catch {
+            // Ignore localStorage failures so generation still works.
+          }
+        };
+
     const hasFeature = (feature, plan = CURRENT_PLAN) => {
       return FEATURE_CONFIG[feature]?.[plan] === true;
     };
@@ -2974,6 +3015,14 @@
         }
       };
 
+      // Free-plan generation gate
+      const handlePromptGeneration = () => {
+        if (!canGeneratePrompt(() => onOpenPlans())) return;
+
+        recordPromptGeneration();
+        saveToHistory();
+        setShowOutput(true);
+      };
       // Save the current generated prompt to local history (max 50 items)
       const saveToHistory = useCallback(() => {
         if (!promptType) return;
@@ -3513,7 +3562,7 @@
                   ))}
                 </select>
                 <button
-                  onClick={() => { saveToHistory(); setShowOutput(true); }}
+                  onClick={handlePromptGeneration}
                   className="px-4 py-2 bg-white text-purple-600 rounded-lg font-semibold hover:bg-purple-100"
                 >
                   Generate JSON →
@@ -3618,7 +3667,7 @@
                     </button>
                   ) : (
                     <button
-                      onClick={() => { saveToHistory(); setShowOutput(true); }}
+                      onClick={handlePromptGeneration}
                       className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
                     >
                       Generate JSON ✓
