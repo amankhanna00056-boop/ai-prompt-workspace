@@ -174,7 +174,94 @@
       return 'pro';
     };
 
-    const getFeatureLabel = (feature) => {
+    const PREMIUM_TEMPLATE_LIBRARY = [
+  {
+    id: 'cinematic_portrait',
+    name: 'Cinematic Portrait',
+    description: 'Create a detailed cinematic portrait with professional lighting and camera settings.',
+    type: 'image',
+    data: {
+      user_intent: 'Create a cinematic professional portrait',
+      'meta.aspect_ratio': '4:3',
+      'meta.quality': 'high',
+      'subject.type': 'person',
+      'subject.description': 'Highly detailed portrait subject with natural skin texture and realistic facial details',
+      'subject.expression': 'neutral',
+      'subject.position': 'center',
+      'scene.time': 'golden_hour',
+      'scene.weather': 'clear_skies',
+      'scene.lighting_type': 'cinematic',
+      'scene.lighting_direction': 'side_lit',
+      'technical.lens': '85mm',
+      'technical.aperture': 'f/2.8',
+      'technical.shutter_speed': '1/250',
+      'technical.iso': '200',
+      'composition.framing': 'close_up',
+      'composition.angle': 'eye_level'
+    }
+  },
+  {
+    id: 'production_saas_app',
+    name: 'Production SaaS App',
+    description: 'Start a production-ready SaaS application architecture with modern technology choices.',
+    type: 'dev',
+    data: {
+      user_intent: 'Build a production-ready SaaS application',
+      'foundation.project_type': 'saas_platform',
+      'foundation.scale': 'production',
+      'foundation.description': 'A scalable SaaS application with authentication, billing, dashboard and user management',
+      'foundation.target_platforms': ['web'],
+      'tech_stack.language': 'typescript',
+      'tech_stack.framework': 'nextjs',
+      'tech_stack.runtime': 'nodejs',
+      'tech_stack.package_manager': 'npm',
+      'tech_stack.monorepo_tool': 'none',
+      'architecture.pattern': 'modular_monolith',
+      'architecture.state_mgmt': 'react_context',
+      'architecture.folder_structure': 'feature_based',
+      'frontend.ui_framework': 'react',
+      'frontend.styling': 'tailwind',
+      'frontend.component_library': 'shadcn_ui',
+      'frontend.responsive_strategy': 'mobile_first',
+      'frontend.accessibility_level': 'wcag_aa',
+      'frontend.meta_framework': 'nextjs_app_router',
+      'frontend.rendering': 'hybrid'
+    }
+  },
+  {
+    id: 'product_launch_campaign',
+    name: 'Product Launch Campaign',
+    description: 'Build a structured multi-channel marketing campaign for a product launch.',
+    type: 'marketing',
+    data: {
+      'campaign.campaign_type': 'product_launch',
+      'campaign.objective': ['increase_awareness', 'drive_traffic', 'boost_sales'],
+      'campaign.kpis': ['ctr', 'conversion_rate', 'roas'],
+      'campaign.budget_tier': 'small_business',
+      'campaign.timeline': 'one_month',
+      'audience.age_range': '25_34',
+      'audience.gender': 'all',
+      'audience.income': 'middle',
+      'audience.geography': ['north_america', 'europe', 'global'],
+      'audience.interests': 'Technology, productivity, AI tools and online business',
+      'audience.values': ['innovation', 'convenience'],
+      'audience.journey_stage': 'consideration',
+      'audience.purchase_behavior': 'research_heavy',
+      'audience.tech_comfort': 'high',
+      'content.content_types': ['social_media', 'email_campaigns', 'landing_pages', 'ad_copy'],
+      'content.tone': 'professional',
+      'content.repurposing_strategy': 'full_omnichannel',
+      'content.ai_content_tools': ['chatgpt'],
+      'channels.social_platforms': ['instagram', 'linkedin', 'youtube', 'reddit'],
+      'channels.email': true,
+      'channels.paid_search': true,
+      'channels.display_ads': false,
+      'channels.influencer': false,
+      'channels.affiliate': false
+    }
+  }
+];
+const getFeatureLabel = (feature) => {
       const labels = {
         premiumTemplates: 'Premium Templates',
         advancedFeatures: 'Advanced Features',
@@ -2762,7 +2849,23 @@
         }
       }, [savedTemplates]);
 
-      const saveTemplate = useCallback(async () => {
+      const loadPremiumTemplate = useCallback((premiumTemplate) => {
+  if (!premiumTemplate) return;
+
+  if (!hasFeature('premiumTemplates')) {
+    onOpenPlans();
+    return;
+  }
+
+  isLoadingTemplateRef.current = true;
+  setFormData(premiumTemplate.data);
+  setPromptType(premiumTemplate.type);
+  setCurrentSection(0);
+  setShowOutput(false);
+  setHasUnsavedChanges(true);
+  showToast('Premium template loaded!');
+}, [onOpenPlans]);
+const saveTemplate = useCallback(async () => {
         if (!templateName.trim()) return;
         if (savedTemplates[templateName] && !(await confirmDialog(`A template named "${templateName}" already exists. Overwrite it?`, { confirmLabel: 'Overwrite' }))) return;
         const newTemplates = {
@@ -3355,6 +3458,63 @@
                 </div>
               )}
 
+              {/* Premium Templates */}
+              <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-400/30 backdrop-blur rounded-xl p-6 mb-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="text-white font-semibold">⭐ Premium Templates</h3>
+                    <p className="text-purple-200 text-sm mt-1">Curated templates for advanced prompt workflows.</p>
+                  </div>
+                  {!hasFeature('premiumTemplates') && (
+                    <span className="text-xs bg-yellow-500/20 text-yellow-200 border border-yellow-400/30 px-3 py-1 rounded-full">
+                      Pro
+                    </span>
+                  )}
+                </div>
+
+                <div className="grid gap-3 md:grid-cols-3">
+                  {PREMIUM_TEMPLATE_LIBRARY.map((premiumTemplate) => {
+                    const isPremiumAvailable = hasFeature('premiumTemplates');
+
+                    return (
+                      <div
+                        key={premiumTemplate.id}
+                        className="bg-white/10 border border-white/10 rounded-lg p-4"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <h4 className="text-white font-medium">{premiumTemplate.name}</h4>
+                            <span className="text-purple-300 text-xs uppercase">{premiumTemplate.type}</span>
+                          </div>
+                          {!isPremiumAvailable && (
+                            <span className="text-lg" title="Pro feature">🔒</span>
+                          )}
+                        </div>
+
+                        <p className="text-purple-100/80 text-sm mt-3 min-h-[60px]">
+                          {premiumTemplate.description}
+                        </p>
+
+                        {isPremiumAvailable ? (
+                          <button
+                            onClick={() => loadPremiumTemplate(premiumTemplate)}
+                            className="w-full mt-3 px-3 py-2 bg-purple-500 text-white rounded-lg text-sm hover:bg-purple-600"
+                          >
+                            Use Template
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => onOpenPlans()}
+                            className="w-full mt-3 px-3 py-2 bg-white/10 text-yellow-200 border border-yellow-400/30 rounded-lg text-sm hover:bg-white/20"
+                          >
+                            Upgrade to Pro
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
               {/* Saved Templates */}
               {Object.keys(savedTemplates).length > 0 && (
                 <div className="bg-white/10 backdrop-blur rounded-xl p-6">
