@@ -116,7 +116,7 @@
 
         const getDailyUsageKey = () => {
           const today = new Date().toISOString().slice(0, 10);
-          return promptStudioUsage_;
+          return `promptStudioUsage_${today}`;
         };
 
         const getDailyGenerationCount = () => {
@@ -2719,6 +2719,9 @@ const getFeatureLabel = (feature) => {
       const [showLibrary, setShowLibrary] = useState(false);
       const [libraryTab, setLibraryTab] = useState('history');
 
+      // === FREE USAGE UI ===
+      const [dailyGenerationCount, setDailyGenerationCount] = useState(() => getDailyGenerationCount());
+
       // === PRO FOUNDATION: PROMPT HISTORY ===
       const [promptHistory, setPromptHistory] = useState(() => {
         try {
@@ -3123,6 +3126,7 @@ const saveTemplate = useCallback(async () => {
         if (!canGeneratePrompt(() => onOpenPlans())) return;
 
         recordPromptGeneration();
+        setDailyGenerationCount(getDailyGenerationCount());
         saveToHistory();
         setShowOutput(true);
       };
@@ -3691,6 +3695,11 @@ const saveTemplate = useCallback(async () => {
               </div>
               <div className="flex items-center gap-2">
                 {autoSaveStatus && <span className="text-xs text-white/60">{autoSaveStatus}</span>}
+                {CURRENT_PLAN === 'free' && (
+                  <span className="text-xs text-white/70">
+                    {dailyGenerationCount} / {FREE_DAILY_GENERATION_LIMIT} generations
+                  </span>
+                )}
                 <ThemeToggle mode={themeMode} setMode={setThemeMode} />
                 <button
                   onClick={() => setShowLibrary(true)}
